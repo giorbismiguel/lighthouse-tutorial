@@ -25,21 +25,51 @@ type Comment{
     post: Post! @belongsTo
 }
 
-type Query{
+type Query {
     posts: [Post] @all
     post (id: Int! @eq): Post @find
     users: [User] @all
     user (id: Int! @eq): User @find
-    latestPost: Post!
-     
+    latestPost: Post!    
+
+    books: [Book] @all
+    book(id: ID @eq): Book @find
+    booksByFeatured(featured: Boolean! @eq): [Book] @all
+    someComplexQuery(search: String!): [Book]
+
+    categories: [Category] @all
+    category(id: ID @eq): Category @find
 }
 
 type Mutation {
     createUser(
-        name: String! @rules(apply: ["required", "min:4"]),
-        email: String! @rules(apply: ["email", "unique:users"]),
-        password: String! @rules(apply: ["min:4"]),        
-    ): User! @create
+        name: String! @rules(apply: ["required"])
+        email: String! @rules(apply: ["required", "email", "unique:users,email"])
+        password: String! @rules(apply: ["min:4"])        
+    ): User! @create(model: "App\\User") 
+
+    updateUser(
+        id: ID @rules(apply: ["required"])
+        name: String
+        email: String @rules(apply: ["email"])
+    ): User @update(model: "App\\User")
+
+    deleteUser(
+        id: ID @rules(apply: ["required"])
+    ): User @delete(model: "App\\User")
+
+    createCategory(
+        name: String! @rules(apply: ["required", "unique:categories,name"])       
+    ): Category @create
+
+    updateCategory(
+        id: ID @rules(apply: ["required"])
+        name: String! @rules(apply: ["required", "unique:categories,name"]) 
+    ): User @update(model: "App\\User")
+
+    deleteCategory(
+        id: ID @rules(apply: ["required"])
+    ): Category @delete(model: "App\\User")
 }
 
 type Book {
@@ -58,5 +88,3 @@ type Category {
     name: String!
     books: [Book] @hasMany
 }
-
-
