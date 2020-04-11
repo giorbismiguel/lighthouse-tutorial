@@ -1,7 +1,6 @@
 """This is a custom built-in Scalar type from LightHouse. It handles Carbon dates"""
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
-
 type User {
     id: ID!
     name: String!
@@ -23,6 +22,23 @@ type Comment{
     id: ID!
     reply: String!
     post: Post! @belongsTo
+}
+
+type Book {
+    id: ID!
+    title: String!
+    author: String!
+    image: String
+    link: String
+    description: String
+    featured: Boolean
+    category: Category! @belongsTo
+}
+
+type Category {
+    id: ID!
+    name: String!
+    books: [Book] @hasMany
 }
 
 type Query {
@@ -65,26 +81,35 @@ type Mutation {
     updateCategory(
         id: ID @rules(apply: ["required"])
         name: String! @rules(apply: ["required", "unique:categories,name"]) 
-    ): User @update(model: "App\\User")
+    ): Category @update(model: "App\\Category")
 
     deleteCategory(
         id: ID @rules(apply: ["required"])
-    ): Category @delete(model: "App\\User")
-}
+    ): Category @delete(model: "App\\Category")
 
-type Book {
-    id: ID!
-    title: String!
-    author: String!
-    image: String
-    link: String
-    description: String
-    feature: Boolean
-    category: Category! @belongsTo
-}
+    createBook(
+        title: String! @rules(apply: ["required"])
+        author: String! @rules(apply: ["required"])
+        image: String! @rules(apply: ["min:4"])        
+        description: String! @rules(apply: ["max:500"])        
+        link: String! @rules(apply: ["max:191"])        
+        featured: Boolean! @rules(apply: ["boolean"])        
+        category_id: Int! @rules(apply: ["int"])        
+    ): Book @create(model: "App\\Book")
 
-type Category {
-    id: ID!
-    name: String!
-    books: [Book] @hasMany
+    updateBook(
+        id: ID @rules(apply: ["required"])
+        title: String! @rules(apply: ["required"])
+        author: String! @rules(apply: ["required"])
+        image: String! @rules(apply: ["min:4"])        
+        description: String! @rules(apply: ["max:500"])        
+        link: String! @rules(apply: ["max:191"])        
+        featured: Boolean! @rules(apply: ["boolean"])        
+        category_id: Int! @rules(apply: ["int"])        
+    ): Book @update(model: "App\\Book")
+
+
+    deleteBook(
+        id: ID! @rules(apply: ["required"])
+    ): Book @delete(model: "App\\Book")    
 }
